@@ -9,7 +9,7 @@ while ($authenticate) {
     $domain_username = Read-Host -Prompt "Enter YOUR ADMIN domain\username"
     $credentials = Get-Credential -UserName $domain_username -Message 'Enter Admin Password'
     try {
-        $session = New-PSSession -ComputerName 'doidc02' -Credential $credentials -ErrorAction Stop
+        $session = New-PSSession -ComputerName '' -Credential $credentials -ErrorAction Stop
         Remove-PSSession $session
         Write-Host "Authentication successful" -ForegroundColor Green
         $authenticate = $false
@@ -33,20 +33,20 @@ $user_answer = Read-Host -Prompt "Are you setting up a New User Account (Y or N)
 if ($user_answer.ToLower() -eq "y"){
     $user_answer_two = Read-Host -Prompt "Did you update the Excel speadsheet(Y or N)?"
         if ($user_answer_two.ToLower() -eq "y"){
-            Invoke-Command -ComputerName "doidc02" -Credential $credentials -ScriptBlock{
+            Invoke-Command -ComputerName "" -Credential $credentials -ScriptBlock{
                 #Global Varibles
                 $credentials = $using:credentials
                 $users = $using:users
-                $Password = "Welcome1"
+                $Password = ""
                 $SecurePassword = ConvertTo-SecureString -String $Password -AsPlainText -Force
                 $AccountEnabled = $true
-                $Street = '180 Maiden Lane'
-                $City = 'New York'
-                $Zip = '10038'
-                $Country = "US"
-                $State = 'New York'
-                $Company = 'NYCDOI'
-                $TelephoneNumber = "212-825-2541"
+                $Street = ''
+                $City = ''
+                $Zip = ''
+                $Country = ""
+                $State = ''
+                $Company = ''
+                $TelephoneNumber = ""
 
                 foreach($user in $users){
                     $Name = $user.Name
@@ -64,26 +64,14 @@ if ($user_answer.ToLower() -eq "y"){
                     $Mlast = $Mname[1]
                     $Manager = Get-ADUser -Filter {GivenName -eq $Mfirst -and Surname -eq $Mlast} | Select-Object -First 1 |Select-Object -ExpandProperty SamAccountName
 
-                    if ($Department -eq "squad1"){$OU = "OU=Squad1,OU=DOI Users,DC=DOI,DC=NYCNET"}
-                    elseif ($Department -eq "squad2"){$OU = "OU=Squad2,OU=DOI Users,DC=DOI,DC=NYCNET"}
-                    elseif ($Department -eq "squad3"){$OU = "OU=Squad3,OU=DOI Users,DC=DOI,DC=NYCNET"}
-                    elseif ($Department -eq "squad4"){$OU = "OU=Squad4,OU=DOI Users,DC=DOI,DC=NYCNET"}
-                    elseif ($Department -eq "squad5"){$OU = "OU=Squad5,OU=DOI Users,DC=DOI,DC=NYCNET"} 
-                    elseif ($Department -eq "squad6"){$OU = "OU=Squad6,OU=DOI Users,DC=DOI,DC=NYCNET"}
-                    elseif ($Department -eq "execunit"){$OU = "OU=ExecUnit,OU=DOI Users,DC=DOI,DC=NYCNET"}
-                    elseif ($Department -eq "background"){$OU = "OU=Background,OU=DOI Users,DC=DOI,DC=NYCNET"}
-                    elseif ($Department -eq "data analytics"){$OU = "OU=Data Analytics,OU=DOI Users,DC=DOI,DC=NYCNET"}
-                    elseif ($Department -eq "digitalforensics"){$OU = "OU=DigitalForensics,OU=DOI Users,DC=DOI,DC=NYCNET"}
-                    elseif ($Department -eq "facilities"){$OU = "OU=Facilities,OU=DOI Users,DC=DOI,DC=NYCNET"}
-                    elseif ($Department -eq "finance"){$OU = "OU=Finance,OU=DOI Users,DC=DOI,DC=NYCNET"}
-                    elseif ($Department -eq "fingerprint"){$OU = "OU=Fingerprint,OU=DOI Users,DC=DOI,DC=NYCNET"}
-                    elseif ($Department -eq "intern"){$OU = "OU=Interns,OU=DOI Users,DC=DOI,DC=NYCNET"}
-                    else {$OU = "OU=TestUsers,OU=DOI Users,DC=DOI,DC=NYCNET"}
+                    if ($Department -eq ""){$OU = ""}
+                    elseif ($Department -eq ""){$OU = ""}
+                    else {$OU = ""}
 
                     #Creates New ADUser Account
                     New-ADUser `
                         -Name $Name `
-                        -UserPrincipalName "$Username@doi.nyc.gov" `
+                        -UserPrincipalName "$Username@test.com" `
                         -SamAccountName $Username `
                         -EmailAddress $Email `
                         -AccountPassword $SecurePassword `
@@ -101,99 +89,27 @@ if ($user_answer.ToLower() -eq "y"){
                         -Department $Department `
                         -Manager $Manager `
                         -Company $Company `
-                        -HomeDirectory "\\doi\doi_share\home_folder\$Username" `
+                        -HomeDirectory "\\home_folder\$Username" `
                         -HomeDrive 'I:' `
                         -OfficePhone $TelephoneNumber `
                         -Credential $credentials
                         
                     #Adds Specific Membership Groups
-                    if ($OU -eq "OU=Squad1,OU=DOI Users,DC=DOI,DC=NYCNET"){
-                        $groups = @('squad1', 'Investigation_Division_EDOCS', 'InvestigationDivision', 'RightFax_Squad1', 'Squad1_Media')
+                    if ($OU -eq ""){
+                        $groups = @('', '', '', '', '')
                         foreach($group in $groups){
                             Add-ADGroupMember -Identity $group -Members @($Username) -Credential $credentials
                         }    
                     }
-                    elseif ($OU -eq "OU=Squad2,OU=DOI Users,DC=DOI,DC=NYCNET"){
-                        $groups = @('squad2', 'Investigation_Division_EDOCS', 'InvestigationDivision', 'RightFax_Squad2')
+                    elseif ($OU -eq ""){
+                        $groups = @('', '', '', '')
                         foreach($group in $groups){
                             Add-ADGroupMember -Identity $group -Members @($Username) -Credential $credentials
                         }  
                     }
-                    elseif ($OU -eq "OU=Squad3,OU=DOI Users,DC=DOI,DC=NYCNET"){
-                        $groups = @('squad3', 'Investigation_Division_EDOCS', 'InvestigationDivision', 'RightFax_Squad3')
-                        foreach($group in $groups){
-                            Add-ADGroupMember -Identity $group -Members @($Username) -Credential $credentials
-                        }
-                    }
-                    elseif ($OU -eq "OU=Squad4,OU=DOI Users,DC=DOI,DC=NYCNET"){
-                        $groups = @('squad4', 'Investigation_Division_EDOCS', 'InvestigationDivision', 'RightFax_Squad4')
-                        foreach($group in $groups){
-                            Add-ADGroupMember -Identity $group -Members @($Username) -Credential $credentials
-                        }
-                    }
-                    elseif ($OU -eq "OU=Squad5,OU=DOI Users,DC=DOI,DC=NYCNET"){
-                        $groups = @('squad5', 'Investigation_Division_EDOCS', 'InvestigationDivision', 'RightFax_Squad5')
-                        foreach($group in $groups){
-                            Add-ADGroupMember -Identity $group -Members @($Username) -Credential $credentials
-                        }
-                    }
-                    elseif ($OU -eq "OU=Squad6,OU=DOI Users,DC=DOI,DC=NYCNET"){
-                        $groups = @('squad6', 'Investigation_Division_EDOCS', 'InvestigationDivision', 'RightFax_Squad6')
-                        foreach($group in $groups){
-                            Add-ADGroupMember -Identity $group -Members @($Username) -Credential $credentials
-                        }
-                    }
-                    elseif ($OU -eq "OU=ExecUnit,OU=DOI Users,DC=DOI,DC=NYCNET"){
-                        $groups = @('EXEC-UNIT','GeneralCounsel', 'Investigation_Division_EDOCS', 'InvestigationDivision', 'RightFax_Executives')
-                        foreach($group in $groups){
-                            Add-ADGroupMember -Identity $group -Members @($Username) -Credential $credentials
-                        }
-                    }
-                    elseif ($OU -eq "OU=Background,OU=DOI Users,DC=DOI,DC=NYCNET"){
-                        $groups = @('BackgroundUnitStaff', 'Investigation_Division_EDOCS', 'InvestigationDivision', 'RightFax_Background')
-                        foreach($group in $groups){
-                            Add-ADGroupMember -Identity $group -Members @($Username) -Credential $credentials
-                        }
-                    }
-                    elseif ($OU -eq "OU=Data Analytics,OU=DOI Users,DC=DOI,DC=NYCNET"){
-                        $groups = @('Data Analytics', 'Investigation_Division_EDOCS', 'Data_Analytics_SG')
-                        foreach($group in $groups){
-                            Add-ADGroupMember -Identity $group -Members @($Username) -Credential $credentials
-                        }
-                    }
-                    elseif ($OU -eq "OU=DigitalForensics,OU=DOI Users,DC=DOI,DC=NYCNET"){
-                        $groups = @('Digital-Forensics-Unit', 'Investigation_Division_EDOCS', 'Forensics', 'InvestigationDivision')
-                        foreach($group in $groups){
-                            Add-ADGroupMember -Identity $group -Members @($Username) -Credential $credentials
-                        }
-                    }
-                    elseif ($OU -eq "OU=Facilities,OU=DOI Users,DC=DOI,DC=NYCNET"){
-                        $groups = @('FacilitiesStaff')
-                        foreach($group in $groups){
-                            Add-ADGroupMember -Identity $group -Members @($Username) -Credential $credentials
-                        }
-                    }
-                    elseif ($OU -eq "OU=Finance,OU=DOI Users,DC=DOI,DC=NYCNET"){
-                        $groups = @('Fiscal', 'FiscalServices', 'RightFax_Finance-Fiscal-Procurement')
-                        foreach($group in $groups){
-                            Add-ADGroupMember -Identity $group -Members @($Username) -Credential $credentials
-                        }
-                    }
-                    elseif ($OU -eq "OU=Fingerprint,OU=DOI Users,DC=DOI,DC=NYCNET"){
-                        $groups = @('FingerprintStaff', 'Fingerprint_Share', 'RightFax_Fingerprint')
-                        foreach($group in $groups){
-                            Add-ADGroupMember -Identity $group -Members @($Username) -Credential $credentials
-                        }
-                    }
-                    elseif ($OU -eq "OU=Interns,OU=DOI Users,DC=DOI,DC=NYCNET"){
-                        $groups = @('Interns')
-                        foreach($group in $groups){
-                            Add-ADGroupMember -Identity $group -Members @($Username) -Credential $credentials
-                        }
-                    }
                     
                     #Adds General Membership Groups
-                    $groups = @('Azure_MFA_PasswordReset', 'MFA_PaloAlto', 'RightFaxUsers', 'VPNUsers', 'M365LicenseGroup', 'MFALicenseGroup')
+                    $groups = @('', '', '', '', '', '')
                     foreach($group in $groups){
                         Add-ADGroupMember `
                             -Identity $group `
@@ -202,7 +118,7 @@ if ($user_answer.ToLower() -eq "y"){
                     }
 
                     #Connects to Azure and performs an ADsync
-                    Invoke-Command -ComputerName doiazad -Credential $credentials -ScriptBlock {
+                    Invoke-Command -ComputerName "" -Credential $credentials -ScriptBlock {
                         Start-ADSyncSyncCycle -PolicyType Delta
                     }
                     
@@ -213,7 +129,7 @@ if ($user_answer.ToLower() -eq "y"){
                     $Session = New-PSSession -ConfigurationName Microsoft.Exchange -ConnectionUri http://doiexchmb01.doi.nycnet/PowerShell/ -Authentication Kerberos -Credential $credentials
                     Import-PSSession $Session -DisableNameChecking
 
-                    Enable-RemoteMailbox -Identity $Name -RemoteRoutingAddress $Username@nycdoi365.mail.onmicrosoft.com
+                    Enable-RemoteMailbox -Identity $Name -RemoteRoutingAddress $Username@mail.onmicrosoft.com
                 }
 
                 #Removes Connection to Exchange Server
@@ -227,11 +143,11 @@ if ($user_answer.ToLower() -eq "y"){
 elseif ($user_answer.ToLower() -eq "n"){
     $user_answer_three = Read-Host -Prompt "Are you Departing a User Account (Y or N)"
     if ($user_answer_three.ToLower() -eq "y"){
-        Invoke-Command -ComputerName "doidc02" -Credential $credentials -ScriptBlock{
+        Invoke-Command -ComputerName "" -Credential $credentials -ScriptBlock{
             $login = $using:login
             $login_name = Get-ADUser -Identity $login
             $From = $login_name.UserPrincipalName
-            $EmailTo = "desktoptechs@doi.nyc.gov", "SecurityAlert@doi.nyc.gov", "garroyo@doi.nyc.gov"
+            $EmailTo = "", "", ""
             
             #Ask for Terminated useraccount, check to make sure the username is active and not already departed.
             $credentials = $using:credentials
@@ -242,7 +158,7 @@ elseif ($user_answer.ToLower() -eq "n"){
                 try {
                     $username_details = Get-ADUser -Identity $username_test -ErrorAction Stop
                     $name_string = $username_details.Name.ToString()
-                    if ($username_details.distinguishedName -eq "CN=$name_string,OU=Departed Users,DC=DOI,DC=NYCNET"){
+                    if ($username_details.distinguishedName -eq "CN=$name_string"){
                         Write-Host "The user $name_string is already departed." -ForegroundColor Red
                         $choice = Read-Host "Would you like to try another username? (Y/N)"
                         if ($choice -eq 'N' -or $choice -eq 'n'){
@@ -284,7 +200,7 @@ elseif ($user_answer.ToLower() -eq "n"){
             }
     
             #Reset Password
-            Set-ADAccountPassword -Identity $username -Reset -NewPassword (ConvertTo-SecureString -AsPlainText "Welcome!@#" -Force)
+            Set-ADAccountPassword -Identity $username -Reset -NewPassword (ConvertTo-SecureString -AsPlainText "" -Force)
     
             #Assigned memberships
             $assignedgroups = Get-ADPrincipalGroupMembership -Identity $username | Select-Object Name | Out-String
@@ -303,7 +219,7 @@ elseif ($user_answer.ToLower() -eq "n"){
             $membershipgroups = Get-ADPrincipalGroupMembership -Identity $username
     
             foreach ($membership in $membershipgroups){
-                if ($membership.distinguishedName -eq 'CN=Domain Users,OU=General SG,OU=Security Groups,OU=Groups,DC=DOI,DC=NYCNET')
+                if ($membership.distinguishedName -eq '')
                 {
                 continue
                 }
@@ -312,20 +228,20 @@ elseif ($user_answer.ToLower() -eq "n"){
     
             #Move AD account to Departed User's OU
             $username_details = Get-ADUser -Identity $username
-            Move-ADObject -Identity $username_details.distinguishedName -TargetPath 'OU=Departed Users,DC=DOI,DC=NYCNET' -Credential $credentials
+            Move-ADObject -Identity $username_details.distinguishedName -TargetPath '' -Credential $credentials
     
             #Move the Home and Profile folders to the Archive server. 
             $Folder_Name = $username
-            $Path1 = "\\doiarchive01\home_archive\$Folder_Name"
+            $Path1 = "\\home_archive\$Folder_Name"
             New-Item -Path $Path1 -ItemType Directory 
-            $Path2 = "\\doiarchive01\profile_archive\$Folder_Name"
+            $Path2 = "\\profile_archive\$Folder_Name"
             New-Item -Path $Path2 -ItemType Directory 
     
-            $Source_Home_Folder = "\\doi.nycnet\doi_share\home_folder\$Folder_Name"
-            $Destination_Home_Folder = "\\DOIARCHIVE01\HOME_ARCHIVE\$Folder_name"
+            $Source_Home_Folder = "\\home_folder\$Folder_Name"
+            $Destination_Home_Folder = "\\HOME_ARCHIVE\$Folder_name"
     
-            $Source_Profile_folder = "\\DOIPROFILE01\USER_FOLDER_REDIRECTION\$Folder_name"
-            $Destination_Profile_folder = "\\DOIARCHIVE01\PROFILE_ARCHIVE\$Folder_name"
+            $Source_Profile_folder = "\\USER_FOLDER_REDIRECTION\$Folder_name"
+            $Destination_Profile_folder = "\\PROFILE_ARCHIVE\$Folder_name"
     
             #Robocopy Execute
             robocopy $Source_Home_Folder $Destination_Home_Folder /COPYALL /Z /E /W:1 /R:2 /tee /Move 
