@@ -108,10 +108,10 @@ if ($user_answer.ToLower() -eq "y"){
                     Start-Sleep -Seconds 45
 
                     #Connects to the Exchange Server and Enables Remote mailbox 
-                    $Session = New-PSSession -ConfigurationName Microsoft.Exchange -ConnectionUri http://doiexchmb01.doi.nycnet/PowerShell/ -Authentication Kerberos -Credential $credentials
+                    $Session = New-PSSession -ConfigurationName Microsoft.Exchange -ConnectionUri http://Exchange Server/PowerShell/ -Authentication Kerberos -Credential $credentials
                     Import-PSSession $Session -DisableNameChecking
 
-                    Enable-RemoteMailbox -Identity $Name -RemoteRoutingAddress $Username@nycdoi365.mail.onmicrosoft.com
+                    Enable-RemoteMailbox -Identity $Name -RemoteRoutingAddress $Username@server.mail.onmicrosoft.com
                     
                     #Removes Connection to Exchange Server
                     Remove-PSSession $Session
